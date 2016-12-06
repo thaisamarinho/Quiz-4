@@ -1,0 +1,68 @@
+
+<div class="col-md-6">
+  <h2><%= @auction.title %></h2>
+  <p><b><%= @auction.description %></b></p>
+  <p>Ends on: <b><%= @auction.ends_on %></b></p>
+  <p>Reserve Price($): <b><%= @auction.reserve_price %></b></p>
+  <%= link_to edit_auction_path(@auction) do %>
+    <span class="glyphicon glyphicon-pencil"></span>
+  <% end %>
+  <%= link_to auction_path(@auction), method: :delete do %>
+    <span class="glyphicon glyphicon-trash"></span>
+  <%end%><br>
+
+  <% if @auction.draft? %>
+    <%= link_to 'Publish', auction_publish_path(@auction),
+                           method: :post,
+                           class: 'btn btn-default' %>
+    <%= link_to 'Cancel', auction_cancel_path(@auction),
+                           method: :post,
+                           class: 'btn btn-default' %>
+  <% elsif @auction.published? %>
+    <%= link_to 'Draft', auction_draft_path(@auction),
+                           method: :post,
+                           class: 'btn btn-default' %>
+    <%= link_to 'Cancel', auction_cancel_path(@auction),
+                           method: :post,
+                           class: 'btn btn-default' %>
+  <% elsif @auction.canceled? %>
+    <%= link_to 'Draft', auction_draft_path(@auction),
+                           method: :post,
+                           class: 'btn btn-default' %>
+  <% elsif @auction.reserve_met? || @auction.reserve_not_met? %>
+    <%= link_to 'Cancel', auction_cancel_path(@auction),
+                          method: :post,
+                          class: 'btn btn-default' %>
+  <%end%>
+
+  <hr>
+  <% if current_user != @auction.user && !(@auction.draft?) %>
+    <%= form_for @bid, url: auction_bids_path(@auction), html: {class: 'form-inline'} do |b| %>
+    <div class="form-group">
+      <%= b.text_field :price %>
+    </div>
+    <div class="form-group">
+      <%= b.submit 'Bid', class: 'btn btn-default'  %>
+    </div>
+    <%end%>
+  <%end%>
+
+  <div class="Bids">
+    <h3>Previous Bids: </h3>
+    <% @auction.bids.each do |bid| %>
+      <p>$ <%= bid.price%> at <%= bid.created_at.strftime("%l:%M%P, %B %d, %Y ")  %></p>
+    <% end %>
+
+  </div>
+</div>
+
+<div class="col-md-6">
+    <h2>Current Price($): <%= @auction.bids.max&.price %></h2>
+    <% if @auction.reserve_not_met? %>
+      <p>Reserve Not Met</p>
+    <% elsif @auction.reserve_met? %>
+      <p>Reserve Met</p>
+      <% elsif @auction.won? %>
+      <p>Won <%=@bids.max.price%></p>
+    <% end %>
+</div>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Biddr</title>
+    <%= csrf_meta_tags %>
+
+    <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+  </head>
+
+  <body>
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <span class="navbar-brand"><%= link_to 'Biddr', home_path %></span>
+        </div>
+
+        <div class="navbar-collapse collapse" id="ido-navbar">
+          <ul class="nav navbar-nav">
+            <li><%= link_to 'All Auctions', auctions_path%></li>
+            <li> <%= link_to 'New Auction', new_auction_path%></li>
+
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <% if user_signed_in?%>
+                <li>
+                  <p class="navbar-text">Hello <%=current_user.first_name%></p>
+                </li>
+                <li><%= button_to 'Sign Out', sessions_path, method: :delete, class: 'btn btn-default navbar-btn' %></li>
+            <% else %>
+              <li><%= link_to 'Sign up', new_user_path %></li>
+              <li><%= link_to 'Sign in', new_session_path %></li>
+            <%end%>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div class="container-fluid">
+      <%= alert || notice %>
+      <%= yield %>
+    </div>
+  </body>
+</html>
