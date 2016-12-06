@@ -1,10 +1,11 @@
 require 'rails_helper'
 
 RSpec.describe AuctionsController, type: :controller do
+
   describe '#new' do
-    let(:user) {create(:user)}
+    let(:user) { create(:user) }
     context 'with user signed in' do
-      before {request.session[:user_id] = user.id}
+      before { request.session[:user_id] = user.id }
       it 'renders new auction page' do
         get :new
         expect(response).to render_template(:new)
@@ -16,7 +17,7 @@ RSpec.describe AuctionsController, type: :controller do
     end
 
     context 'with user signed out' do
-      before {request.session[:user_id] = nil}
+      before { request.session[:user_id] = nil }
       it 'renders new auction page' do
         get :new
         expect(response).to redirect_to(new_session_path)
@@ -25,11 +26,11 @@ RSpec.describe AuctionsController, type: :controller do
   end
 
   describe '#create' do
-    # let(:user) {create(:user)}
+    let(:user) { create(:user) }
     context 'with valid params' do
-      # before {request.session[:user_id] = user.id}
+      before { request.session[:user_id] = user.id }
       def valid_params
-        post :create, params: {auction: attributes_for(:auction)}
+        post :create, params: { auction: attributes_for(:auction, user: user) }
       end
 
       it 'saves the record to the database' do
@@ -38,11 +39,19 @@ RSpec.describe AuctionsController, type: :controller do
         count_after = Auction.count
         expect(count_after).to eq(count_before + 1)
       end
-
-
     end
-    context 'with invalid params' do
 
+    context 'with invalid params' do
+      before { request.session[:user_id] = user.id }
+      def invalid_params
+        post :create, params: { auction: attributes_for(:auction, user: user, title: nil) }
+      end
+      it 'does not saves the record to the database' do
+        count_before = Auction.count
+        invalid_params
+        count_after = Auction.count
+        expect(count_after).to eq(count_before)
+      end
     end
   end
 end

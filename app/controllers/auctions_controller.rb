@@ -7,21 +7,25 @@ class AuctionsController < ApplicationController
   end
 
   def create
-    byebug
     @auction = Auction.new auction_params
     @auction.user = current_user
-    @auction.ends_on = (@auction.ends_on).to_date
-    @auction.save
-    redirect_to auction_path(@auction)
+    if @auction.valid?
+      @auction.ends_on = @auction.ends_on.to_date
+      if @auction.save
+        redirect_to auction_path(@auction)
+      else
+        render(:new)
+      end
+    end
   end
 
   def index
-    @auctions = Auction.order(created_at: :desc)
+    @auctions = Auction.display_state.order(created_at: :desc)
   end
 
   def show
     @bid = Bid.new
-    @bids = Bid.where(auction_id: @auction).order(price: :desc)
+    @bids = Bid.order(created_at: :desc).where(auction_id: @auction)
   end
 
   def edit
@@ -50,9 +54,3 @@ class AuctionsController < ApplicationController
     @auction = Auction.find params[:id]
   end
 end
-
-# Add state machine with these states to the auction model: draft / published / reserve met / won / canceled / reserve not met. Add events to the state machine that trigger going from one state to another.
-#
-# Add user authentication and disallow users to bid on their own auctions.
-#
-# Implement the ability to publish an auction by having a "publish" button on the auction show page. This should only be visible to the creator of the auction.

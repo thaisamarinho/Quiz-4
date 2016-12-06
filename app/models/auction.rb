@@ -8,6 +8,10 @@ class Auction < ApplicationRecord
   validates :ends_on, presence: true
   validates :reserve_price, presence: true
 
+  scope :display_state, -> {
+    where(aasm_state: ['published', 'reserve_met', 'reserve_not_met', 'won'])
+  }
+
   include AASM
 
   aasm do
@@ -42,5 +46,4 @@ class Auction < ApplicationRecord
       transitions from: [:canceled, :published], to: :draft
     end
   end
-
 end

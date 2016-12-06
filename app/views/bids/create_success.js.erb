@@ -1,0 +1,4 @@
+$('#bids').prepend("<%= j render 'bid', bid: @bid %>");
+
+<% @bid = Bid.new %>
+$('#bid-form').html('<%= j render 'form' %>')

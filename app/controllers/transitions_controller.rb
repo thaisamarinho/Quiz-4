@@ -40,7 +40,7 @@ class TransitionsController < ApplicationController
       redirect_to home
     end
   end
-  
+
   def create_draft
     if @auction.draft!
       redirect_to @auction
@@ -54,5 +54,4 @@ class TransitionsController < ApplicationController
   def find_auction
     @auction = Auction.find params[:auction_id]
   end
-
 end

@@ -11,48 +11,44 @@
     <span class="glyphicon glyphicon-trash"></span>
   <%end%><br>
 
-  <% if @auction.draft? %>
-    <%= link_to 'Publish', auction_publish_path(@auction),
-                           method: :post,
-                           class: 'btn btn-default' %>
-    <%= link_to 'Cancel', auction_cancel_path(@auction),
-                           method: :post,
-                           class: 'btn btn-default' %>
-  <% elsif @auction.published? %>
-    <%= link_to 'Draft', auction_draft_path(@auction),
-                           method: :post,
-                           class: 'btn btn-default' %>
-    <%= link_to 'Cancel', auction_cancel_path(@auction),
-                           method: :post,
-                           class: 'btn btn-default' %>
-  <% elsif @auction.canceled? %>
-    <%= link_to 'Draft', auction_draft_path(@auction),
-                           method: :post,
-                           class: 'btn btn-default' %>
-  <% elsif @auction.reserve_met? || @auction.reserve_not_met? %>
-    <%= link_to 'Cancel', auction_cancel_path(@auction),
-                          method: :post,
-                          class: 'btn btn-default' %>
+<% if current_user == @auction.user %>
+    <% if @auction.draft? %>
+      <%= link_to 'Publish', auction_publish_path(@auction),
+                             method: :post,
+                             class: 'btn btn-default' %>
+      <%= link_to 'Cancel', auction_cancel_path(@auction),
+                             method: :post,
+                             class: 'btn btn-default' %>
+    <% elsif @auction.published? %>
+      <%= link_to 'Draft', auction_draft_path(@auction),
+                             method: :post,
+                             class: 'btn btn-default' %>
+      <%= link_to 'Cancel', auction_cancel_path(@auction),
+                             method: :post,
+                             class: 'btn btn-default' %>
+    <% elsif @auction.canceled? %>
+      <%= link_to 'Draft', auction_draft_path(@auction),
+                             method: :post,
+                             class: 'btn btn-default' %>
+    <% elsif @auction.reserve_met? || @auction.reserve_not_met? %>
+      <%= link_to 'Cancel', auction_cancel_path(@auction),
+                            method: :post,
+                            class: 'btn btn-default' %>
+    <%end%>
   <%end%>
 
   <hr>
   <% if current_user != @auction.user && !(@auction.draft?) %>
-    <%= form_for @bid, url: auction_bids_path(@auction), html: {class: 'form-inline'} do |b| %>
-    <div class="form-group">
-      <%= b.text_field :price %>
-    </div>
-    <div class="form-group">
-      <%= b.submit 'Bid', class: 'btn btn-default'  %>
-    </div>
-    <%end%>
+  <div id="bid-form">
+    <%= render '/bids/form' %>
+  </div>
   <%end%>
 
-  <div class="Bids">
-    <h3>Previous Bids: </h3>
+  <h3>Previous Bids: </h3>
+  <div id="bids">
     <% @auction.bids.each do |bid| %>
-      <p>$ <%= bid.price%> at <%= bid.created_at.strftime("%l:%M%P, %B %d, %Y ")  %></p>
+      <%= render '/bids/bid', {bid: bid} %>
     <% end %>
-
   </div>
 </div>
 

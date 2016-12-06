@@ -11,15 +11,22 @@ class BidsController < ApplicationController
     else
       max_bid = @auction.bids.max&.price
     end
-    if @bid.price > max_bid
+    if @bid.valid? && @bid.price > max_bid
       if @bid.save
         set_auction_state
         if @auction.reserve_met? && @auction.bids.max.price > @auction.reserve_price && @auction.ends_on < Date.today
           @auction.update_attributes(aasm_state: 'won')
         end
-        redirect_to auction_path(@auction)
+
+        respond_to do |format|
+          format.js { render :create_success }
+          format.html {redirect_to auction_path(@auction)}
+        end
       else
-        render ('auctions/show')
+        respond_to do |format|
+          format.html { render ('auctions/show') }
+          format.js { render :create_failure }
+        end
       end
     else
       render ('auctions/show'), alert: 'Bid should be higher than max bid'
